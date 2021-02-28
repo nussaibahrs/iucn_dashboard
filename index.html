@@ -271,6 +271,33 @@
         .attr('height', radius * 2)
         .style("opacity", 0)
 
+      svg.append("text")
+        .attr("y", circleY + radius) //magic number here
+        .attr("x", circleX)
+        .attr('text-anchor', 'middle')
+        .attr("class", "myLabel") //easy to style with CSS
+        .text("Branching corals")
+        .style("font-weight", "bold")
+        .style("opacity", 0)
+
+        svg.append("text")
+          .attr("y", circleY + radius) //magic number here
+          .attr("x", lineEnd[0] + markerWidth + 10 + radius)
+          .attr('text-anchor', 'middle')
+          .attr("class", "myLabel") //easy to style with CSS
+          .text("Non-branching corals")
+          .style("font-weight", "bold")
+          .style("opacity", 0)
+
+          svg.append("text")
+            .attr("y", circleY+20) //magic number here
+            .attr("x", lineStart[0] + 170)
+            .attr('text-anchor', 'middle')
+            .attr("class", "myLabel") //easy to style with CSS
+            .text("Decreasing extinction risk")
+            .style("font-style", "italic")
+            .style("opacity", 0)
+
     }
 
     function draw1() {
@@ -328,6 +355,9 @@
         })
         .attr("stroke-width", 1)
         .attr("fill-opacity", .2)
+
+      showTraits(0)
+
     }
 
     function draw3() {
@@ -335,7 +365,7 @@
 
       // remove map
       d3.selectAll(".worldmap")
-      .selectAll("path")
+        .selectAll("path")
         .transition()
         .attr("duration", function(d, i) {
           return 100 + i * 0
@@ -350,18 +380,36 @@
         .attr("stroke-width", 0)
         .attr("fill-opacity", 0)
 
+      showTraits(1)
+    }
+
+    function showTraits(o) {
       d3.selectAll("image")
         .transition()
         .attr("duration", function(d, i) {
           return 100 + i * 0
         })
-        .style("opacity", 1)
+        .style("opacity", o)
 
       d3.select("#my_line")
         .transition()
         .duration(100)
-        .style("opacity", 1)
-        .attr("fill-opacity", 1)
+        .style("opacity", o)
+
+      d3.select("#arrow")
+        .style("opacity", o)
+        .selectAll("path")
+        .transition()
+        .duration(100)
+        .attr("fill-opacity", o)
+
+        d3.selectAll(".myLabel")
+          .transition()
+          .attr("duration", function(d, i) {
+            return 100 + i * 0
+          })
+          .style("opacity", o)
+
     }
 
     //Array of all the graph functions

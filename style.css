@@ -20,6 +20,11 @@ body {
     font-family: "Domine";
 }
 
+.myLabel {
+    font-family: "Domine";
+}
+
+
 .step {
     margin-bottom: 100px;
     height: 700px;
@@ -31,6 +36,7 @@ body {
     flex-direction: column;
     justify-content: space-around; */
 }
+
 
 h1, h2 {
     font-weight: 700;

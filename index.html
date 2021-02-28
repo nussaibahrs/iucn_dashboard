@@ -138,12 +138,12 @@
       .translate([width / 2, height / 2])
 
     //load coordinates for plotting on map: modern corals
-    d3.csv("data/corals.csv", function(data) {
+    d3.csv("/data/corals.csv", function(data) {
       corals = data
     })
 
     //load coordinates for plotting on map: modern corals
-    d3.csv("data/traits_iucn.csv", function(data) {
+    d3.csv("/data/traits_iucn.csv", function(data) {
       modern_traits = data
     })
 
@@ -159,6 +159,8 @@
     function drawInitial() {
       // creating legend for IUCN categories
       createLegend(20, 50)
+      createLegend2(20, 50)
+
 
       let svg = d3.select("#vis")
         .append('svg')
@@ -272,12 +274,13 @@
         .style("opacity", 0)
 
       svg.append("text")
+      .attr("class", "myLabel") //easy to style with CSS
         .attr("y", circleY + radius) //magic number here
         .attr("x", circleX)
         .attr('text-anchor', 'middle')
-        .attr("class", "myLabel") //easy to style with CSS
         .text("Branching corals")
         .style("font-weight", "bold")
+        .style("font-family", "Domine")
         .style("opacity", 0)
 
         svg.append("text")
@@ -287,6 +290,7 @@
           .attr("class", "myLabel") //easy to style with CSS
           .text("Non-branching corals")
           .style("font-weight", "bold")
+          .style("font-family", "Domine")
           .style("opacity", 0)
 
           svg.append("text")
@@ -296,7 +300,18 @@
             .attr("class", "myLabel") //easy to style with CSS
             .text("Decreasing extinction risk")
             .style("font-style", "italic")
+            .style("font-family", "Domine")
             .style("opacity", 0)
+
+            svg.append("text")
+              .attr("y", circleY-10) //magic number here
+              .attr("x", lineStart[0] + 170)
+              .attr('text-anchor', 'middle')
+              .attr("class", "myLabel") //easy to style with CSS
+              .text("Decreasing degree of branching")
+              .style("font-style", "italic")
+              .style("font-family", "Domine")
+              .style("opacity", 0)
 
     }
 
@@ -324,7 +339,6 @@
     }
 
     function draw2() {
-      createLegend2(20, 50)
       let svg = d3.select('#vis').select('svg')
 
 

@@ -52,9 +52,9 @@
         <svg id='legend2' width='400px' height='500px'></svg>
       </section>
       <section class="step">
-        <h1>Threatened corals in modern oceans</h1>
+        <h1>Life history traits don't match</h1>
         <p>
-          33% of corals are threatened
+          Branching vs Non Branching
         </p>
       </section>
 
@@ -205,6 +205,72 @@
           return colors(d.redlistCategory)
         })
 
+      // Define the image variables
+      const circleX = 150;
+      const circleY = height / 2 - 150;
+      const radius = 80;
+
+      // Define the line variables
+      const lineLength = 350;
+      const lineStart = [circleX + radius, circleY];
+      const lineEnd = [lineStart[0] + lineLength, circleY];
+
+      // Define the arrowhead marker variables
+      const markerBoxWidth = 20;
+      const markerBoxHeight = 20;
+      const refX = markerBoxWidth / 2;
+      const refY = markerBoxHeight / 2;
+      const markerWidth = markerBoxWidth / 2;
+      const markerHeight = markerBoxHeight / 2;
+      const arrowPoints = [
+        [0, 0],
+        [0, 20],
+        [20, 10]
+      ];
+
+      // Add the arrowhead marker definition to the svg element
+      svg
+        .append('defs')
+        .append('marker')
+        .attr('id', 'arrow')
+        .attr('viewBox', [0, 0, markerBoxWidth, markerBoxHeight])
+        .attr('refX', refX)
+        .attr('refY', refY)
+        .attr('markerWidth', markerBoxWidth)
+        .attr('markerHeight', markerBoxHeight)
+        .attr('orient', 'auto-start-reverse')
+        .append('path')
+        .attr('d', d3.line()(arrowPoints))
+        .attr('stroke', 'black');
+
+      // Add the line with arrowhead at the end
+      svg
+        .append('path')
+        .attr('d', d3.line()([lineStart, lineEnd]))
+        .attr('stroke', 'black')
+        .attr('marker-end', 'url(#arrow)')
+        .attr('fill', 'none')
+        .style("opacity", 0)
+        .attr("id", "my_line")
+
+      svg
+        .append('svg:image')
+        .attr("href", "www/branching.svg")
+        .attr('x', circleX - radius)
+        .attr('y', circleY - radius * 1.5)
+        .attr('width', radius * 2)
+        .attr('height', radius * 2)
+        .style("opacity", 0)
+
+      svg
+        .append('svg:image')
+        .attr("href", "www/nonbranching.svg")
+        .attr('x', lineEnd[0] + markerWidth + 10)
+        .attr('y', circleY - radius)
+        .attr('width', radius * 2)
+        .attr('height', radius * 2)
+        .style("opacity", 0)
+
     }
 
     function draw1() {
@@ -268,7 +334,8 @@
       let svg = d3.select('#vis').select('svg')
 
       // remove map
-      d3.selectAll("path")
+      d3.selectAll(".worldmap")
+      .selectAll("path")
         .transition()
         .attr("duration", function(d, i) {
           return 100 + i * 0
@@ -282,6 +349,19 @@
         })
         .attr("stroke-width", 0)
         .attr("fill-opacity", 0)
+
+      d3.selectAll("image")
+        .transition()
+        .attr("duration", function(d, i) {
+          return 100 + i * 0
+        })
+        .style("opacity", 1)
+
+      d3.select("#my_line")
+        .transition()
+        .duration(100)
+        .style("opacity", 1)
+        .attr("fill-opacity", 1)
     }
 
     //Array of all the graph functions

@@ -71,7 +71,7 @@
     //visualisations
 
     //let svg
-    let svg, map, corals
+    let svg, map, corals, modern_traits
     let categoryColorScale, categoryLegend
     let categoryColorScale2, categoryLegend2
 
@@ -143,6 +143,11 @@
       corals = data
     })
 
+    //load coordinates for plotting on map: modern corals
+    d3.csv("/data/traits_iucn.csv", function(data) {
+      modern_traits = data
+    })
+
 
     // Load external map data and boot
     d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson", function(data) {
@@ -173,15 +178,18 @@
         .attr("d", d3.geoPath()
           .projection(projection)
         )
+
+      // add points
       var colors = d3.scaleOrdinal()
         .domain(categories)
         .range(cols)
+
       svg.selectAll(".pin")
         .data(corals)
         .enter()
         .append("circle", ".pin")
         .attr("r", 3)
-        .attr("class", "circle")
+        .attr("class", "circle map")
         .attr("stroke-width", 1)
         .attr("fill-opacity", .2)
         .raise()
@@ -198,6 +206,47 @@
           return colors(d.redlistCategory)
         })
 
+      // packed circles to show threats
+      var colors3 = d3.scaleOrdinal()
+        .domain(threat_categories)
+        .range(threat_cols)
+
+      //add points
+      // Initialize the circle: all located at the center of the svg area
+      var node = svg.append("g")
+        .selectAll("circle")
+        .data(modern_traits)
+        .enter()
+        .append("circle")
+        .attr("class", "circle node")
+        .attr("r", 8)
+        .attr("cx", width / 2)
+        .attr("cy", height / 2)
+        .style("fill", function(d) {
+          return colors3(d.threat)
+        })
+        .style("fill-opacity", 0)
+        .style("stroke-width", 0)
+
+      // Features of the forces applied to the nodes:
+      var simulation = d3.forceSimulation()
+        .force("center", d3.forceCenter().x(width / 2).y(height / 2 - 150)) // Attraction to the center of the svg area
+        .force("charge", d3.forceManyBody().strength(.1)) // Nodes are attracted one each other of value is > 0
+        .force("collide", d3.forceCollide().strength(.2).radius(12).iterations(1)) // Force that avoids circle overlapping
+
+      // Apply these forces to the nodes and update their positions.
+      // Once the force algorithm is happy with positions ('alpha' value is low enough), simulations will stop.
+      simulation
+        .nodes(modern_traits)
+        .on("tick", function(d) {
+          node
+            .attr("cx", function(d) {
+              return d.x;
+            })
+            .attr("cy", function(d) {
+              return d.y;
+            })
+        });
 
     }
 
@@ -210,7 +259,8 @@
         .domain(categories)
         .range(cols)
 
-      d3.selectAll("circle")
+      // change colour again if scrolling up
+      d3.selectAll("circle.map")
         .transition()
         .attr("duration", function(d, i) {
           return 100 + i * 0
@@ -227,18 +277,22 @@
       createLegend2(20, 50)
       let svg = d3.select('#vis').select('svg')
 
+
+
+      //show map again if scrolling up
+      d3.selectAll("path")
+        .transition()
+        .attr("duration", function(d, i) {
+          return 100 + i * 0
+        })
+        .attr("fill-opacity", .4)
+
+      // change colour of points on map
       var colors = d3.scaleOrdinal()
         .domain(categories)
         .range(cols2)
 
-        d3.selectAll("path")
-          .transition()
-          .attr("duration", function(d, i) {
-            return 100 + i * 0
-          })
-          .attr("fill-opacity", .4)
-
-      d3.selectAll("circle")
+      d3.selectAll(".circle.map")
         .transition()
         .attr("duration", function(d, i) {
           return 100 + i * 0
@@ -256,21 +310,29 @@
     function draw3() {
       let svg = d3.select('#vis').select('svg')
 
-
+      // remove map
       d3.selectAll("path")
         .transition()
         .attr("duration", function(d, i) {
           return 100 + i * 0
         })
         .attr("fill-opacity", 0)
+      //remove points on map
+      d3.selectAll("circle.map")
+        .transition()
+        .attr("duration", function(d, i) {
+          return 100 + i * 0
+        })
+        .attr("stroke-width", 0)
+        .attr("fill-opacity", 0)
 
-        d3.selectAll("circle")
+        //remove points on map
+        d3.selectAll("circle.node")
           .transition()
           .attr("duration", function(d, i) {
             return 100 + i * 0
           })
-          .attr("stroke-width", 0)
-          .attr("fill-opacity", 0)
+          .attr("fill-opacity", 1)
     }
 
     //Array of all the graph functions

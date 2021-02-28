@@ -1,0 +1,264 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <!-- Load d3.js and the geo projection plugin -->
+  <script src="https://d3js.org/d3.v4.js"></script>
+  <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js'></script>
+
+  <meta property='og:title' content='Best College Majors' />
+  <meta property='og:image' content='https://github.com/cuthchow/college-majors-visualisation/blob/master/preview.png' />
+  <meta property='og:description'
+    content='This interactive, scrollable data visualisation will take you on a journey through all of the different college majors in the United States, and compare how they stack up in terms of median graduate salary, gender ratios, employability, and other factors. ' />
+  <meta property='og:url' content='https://cuthchow.github.io/college-majors-visualisation/' />
+
+
+  <title>Best College Majors</title>
+</head>
+
+
+<body>
+  <!-- <div id="info">
+        a
+    </div> -->
+  <img src="https://github.com/cuthchow/college-majors-visualisation/blob/master/preview.png" alt="">
+  <div id="tooltip"></div>
+  <div id="graphic">
+    <div id="sections">
+      <section class="step">
+        <div class="title"></div>
+        <br><br>
+        <h1>How accurate is the current conservation status of corals?</h1>
+        <p>By <a href='https://www.linkedin.com/in/cuthbertchow/'>Nussaïbah Raja</a></p>
+        <p>(Note: If the visualisation doesn't fit your screen, try zooming out with ctrl + - / Cmd + -.) </p>
+        <p>
+          Corals around the world are at risk of extinction due to climate change. <br><br>
+
+          If you ever want to find out more about a bubble, just hover over it and a tooltip should appear.<br><br>
+
+          (Data was provided by IUCN, OBIS, the Coral Traits Database and PBDB)
+        </p>
+        <svg id='legend' width='400px' height='500px'></svg>
+
+      </section>
+      <section class="step">
+        <h1>Threatened corals in modern oceans</h1>
+        <p>
+Talk about recategorisation
+        </p>
+        <span></span><span></span><span></span>
+      </section>
+
+
+    </div>
+    <div id="vis">
+
+    </div>
+  </div>
+
+  <script src='scroller.js'></script>
+
+  <script>
+    //visualisations
+
+    //let svg
+    let svg, map, corals
+    let categoryColorScale, categoryLegend
+    let categoryColorScale2
+
+    const margin = {
+      left: 170,
+      top: 50,
+      bottom: 50,
+      right: 20
+    }
+    const width = 1000 - margin.left - margin.right
+    const height = 950 - margin.top - margin.bottom
+
+    const categories = ["Data Deficient", "Least Concern", "Near Threatened", "Vulnerable", "Endangered", "Critically Endangered"]
+    const cols = ["#767676FF", "#155F83FF", "#8A9045FF", "#FFA319FF", "#800000FF", "black"]
+    const cols2 = ["#767676FF", "#155F83FF", "#155F83FF", "#800000FF", "#800000FF", "#800000FF"]
+
+    //Create all the scales and save to global variables
+
+    function createScales() {
+      categoryColorScale = d3.scaleOrdinal()
+        .domain(categories)
+        .range(cols)
+
+      categoryColorScale2 = d3.scaleOrdinal()
+        .domain(categories)
+        .range(cols2)
+    }
+
+    function createLegend(x, y) {
+      let svg = d3.select('#legend')
+
+      categoryLegend = d3.legendColor()
+        .shape('path', d3.symbol().type(d3.symbolCircle).size(150)())
+        .shapePadding(10)
+        .scale(categoryColorScale)
+
+
+      svg.append('g')
+        .attr('class', 'categoryLegend')
+        .attr('transform', `translate(${x},${y})`)
+        .call(categoryLegend);
+    }
+
+    // Map and projection
+    var projection = d3.geoMercator()
+      .center([0, 0]) // GPS of location to zoom on
+      .scale(120) // This is like the zoom
+      .translate([width / 2, height / 2])
+
+    //load coordinates for plotting on map: modern corals
+    d3.csv("https://raw.githubusercontent.com/nussaibahrs/iucn_dashboard/main/data/corals.csv", function(data) {
+      corals = data
+    })
+
+
+    // Load external map data and boot
+    d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson", function(data) {
+      map = data
+      createScales()
+      drawInitial()
+    })
+
+
+    function drawInitial() {
+      // creating legend for IUCN categories
+      createLegend(20, 50)
+
+      let svg = d3.select("#vis")
+        .append('svg')
+        .attr('width', 1000)
+        .attr('height', 950)
+        .attr('opacity', 1)
+
+      // Draw the map
+      svg.append("g")
+        .selectAll("path")
+        .data(map.features)
+        .enter().append("path")
+        .attr("fill", "#b8b8b8")
+        .attr("fill-opacity", .4)
+        .attr("d", d3.geoPath()
+          .projection(projection)
+        )
+      var colors = d3.scaleOrdinal()
+        .domain(categories)
+        .range(cols)
+      svg.selectAll(".pin")
+        .data(corals)
+        .enter()
+        .append("circle", ".pin")
+        .attr("r", 3)
+        .attr("class", "circle")
+        .attr("stroke-width", 1)
+        .attr("fill-opacity", .2)
+        .raise()
+        .attr("transform", function(d) {
+          return "translate(" + projection([
+            +d.decimalLongitude,
+            +d.decimalLatitude
+          ]) + ")";
+        })
+        .style("fill", function(d) {
+          return colors(d.redlistCategory)
+        })
+        .attr("stroke", function(d) {
+          return colors(d.redlistCategory)
+        })
+
+
+    }
+
+    function draw1() {
+      let svg = d3.select('#vis').select('svg')
+
+      var colors = d3.scaleOrdinal()
+        .domain(categories)
+        .range(cols)
+
+      d3.selectAll("circle")
+        .transition()
+        .attr("duration", function(d, i) {
+          return 100 + i * 0
+        })
+        .style("fill", function(d) {
+          return colors(d.redlistCategory)
+        })
+        .attr("stroke", function(d) {
+          return colors(d.redlistCategory)
+        })
+    }
+
+    function draw2() {
+      let svg = d3.select('#vis').select('svg')
+
+      var colors = d3.scaleOrdinal()
+        .domain(categories)
+        .range(cols2)
+
+      d3.selectAll("circle")
+        .transition()
+        .attr("duration", function(d, i) {
+          return 100 + i * 0
+        })
+        .style("fill", function(d) {
+          return colors(d.redlistCategory)
+        })
+        .attr("stroke", function(d) {
+          return colors(d.redlistCategory)
+        })
+    }
+
+    //Array of all the graph functions
+    //Will be called from the scroller functionality
+
+    let activationFunctions = [
+      draw1,
+      draw2
+    ]
+
+    //All the scrolling function
+    //Will draw a new graph based on the index provided by the scroll
+
+
+    let scroll = scroller()
+      .container(d3.select('#graphic'))
+    scroll()
+
+    let lastIndex, activeIndex = 0
+
+    scroll.on('active', function(index) {
+      d3.selectAll('.step')
+        .transition().duration(500)
+        .style('opacity', function(d, i) {
+          return i === index ? 1 : 0.1;
+        });
+
+      activeIndex = index
+      let sign = (activeIndex - lastIndex) < 0 ? -1 : 1;
+      let scrolledSections = d3.range(lastIndex + sign, activeIndex + sign, sign);
+      scrolledSections.forEach(i => {
+        activationFunctions[i]();
+      })
+      lastIndex = activeIndex;
+
+    })
+
+    scroll.on('progress', function(index, progress) {
+      if (index == 2 & progress > 0.7) {
+
+      }
+    })
+  </script>
+
+</body>
+
+</html>

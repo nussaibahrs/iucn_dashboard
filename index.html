@@ -16,7 +16,7 @@
   <meta property='og:url' content='https://cuthchow.github.io/college-majors-visualisation/' />
 
 
-  <title>Conservation Status of Coralss</title>
+  <title>Conservation Status of Corals</title>
 </head>
 
 
@@ -47,10 +47,15 @@
       <section class="step">
         <h1>Threatened corals in modern oceans</h1>
         <p>
-Talk about recategorisation
+          Talk about recategorisation
         </p>
         <svg id='legend2' width='400px' height='500px'></svg>
-        <span></span><span></span><span></span>
+      </section>
+      <section class="step">
+        <h1>Threatened corals in modern oceans</h1>
+        <p>
+          33% of corals are threatened
+        </p>
       </section>
 
 
@@ -83,7 +88,7 @@ Talk about recategorisation
     const cols = ["#767676FF", "#155F83FF", "#8A9045FF", "#FFA319FF", "#800000FF", "black"]
     const cols2 = ["#767676FF", "#155F83FF", "#155F83FF", "#800000FF", "#800000FF", "#800000FF"]
     const threat_categories = ["Data Deficient", "Not Threatened", "Threatened"]
-    const threat_cols = ["#767676FF", "#155F83FF","#800000FF"]
+    const threat_cols = ["#767676FF", "#155F83FF", "#800000FF"]
 
     //Create all the scales and save to global variables
 
@@ -159,6 +164,7 @@ Talk about recategorisation
 
       // Draw the map
       svg.append("g")
+        .attr("class", "worldmap")
         .selectAll("path")
         .data(map.features)
         .enter().append("path")
@@ -202,7 +208,7 @@ Talk about recategorisation
 
       var colors = d3.scaleOrdinal()
         .domain(categories)
-        .range(cols2)
+        .range(cols)
 
       d3.selectAll("circle")
         .transition()
@@ -225,6 +231,13 @@ Talk about recategorisation
         .domain(categories)
         .range(cols2)
 
+        d3.selectAll("path")
+          .transition()
+          .attr("duration", function(d, i) {
+            return 100 + i * 0
+          })
+          .attr("fill-opacity", .4)
+
       d3.selectAll("circle")
         .transition()
         .attr("duration", function(d, i) {
@@ -236,6 +249,28 @@ Talk about recategorisation
         .attr("stroke", function(d) {
           return colors(d.redlistCategory)
         })
+        .attr("stroke-width", 1)
+        .attr("fill-opacity", .2)
+    }
+
+    function draw3() {
+      let svg = d3.select('#vis').select('svg')
+
+
+      d3.selectAll("path")
+        .transition()
+        .attr("duration", function(d, i) {
+          return 100 + i * 0
+        })
+        .attr("fill-opacity", 0)
+
+        d3.selectAll("circle")
+          .transition()
+          .attr("duration", function(d, i) {
+            return 100 + i * 0
+          })
+          .attr("stroke-width", 0)
+          .attr("fill-opacity", 0)
     }
 
     //Array of all the graph functions
@@ -243,7 +278,8 @@ Talk about recategorisation
 
     let activationFunctions = [
       draw1,
-      draw2
+      draw2,
+      draw3
     ]
 
     //All the scrolling function

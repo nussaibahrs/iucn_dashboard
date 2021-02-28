@@ -138,12 +138,12 @@
       .translate([width / 2, height / 2])
 
     //load coordinates for plotting on map: modern corals
-    d3.csv("/data/corals.csv", function(data) {
+    d3.csv("data/corals.csv", function(data) {
       corals = data
     })
 
     //load coordinates for plotting on map: modern corals
-    d3.csv("/data/traits_iucn.csv", function(data) {
+    d3.csv("data/traits_iucn.csv", function(data) {
       modern_traits = data
     })
 

@@ -16,7 +16,7 @@
   <meta property='og:url' content='https://cuthchow.github.io/college-majors-visualisation/' />
 
 
-  <title>Best College Majors</title>
+  <title>Conservation Status of Coralss</title>
 </head>
 
 
@@ -49,6 +49,7 @@
         <p>
 Talk about recategorisation
         </p>
+        <svg id='legend2' width='400px' height='500px'></svg>
         <span></span><span></span><span></span>
       </section>
 
@@ -67,7 +68,7 @@ Talk about recategorisation
     //let svg
     let svg, map, corals
     let categoryColorScale, categoryLegend
-    let categoryColorScale2
+    let categoryColorScale2, categoryLegend2
 
     const margin = {
       left: 170,
@@ -81,6 +82,8 @@ Talk about recategorisation
     const categories = ["Data Deficient", "Least Concern", "Near Threatened", "Vulnerable", "Endangered", "Critically Endangered"]
     const cols = ["#767676FF", "#155F83FF", "#8A9045FF", "#FFA319FF", "#800000FF", "black"]
     const cols2 = ["#767676FF", "#155F83FF", "#155F83FF", "#800000FF", "#800000FF", "#800000FF"]
+    const threat_categories = ["Data Deficient", "Not Threatened", "Threatened"]
+    const threat_cols = ["#767676FF", "#155F83FF","#800000FF"]
 
     //Create all the scales and save to global variables
 
@@ -90,8 +93,8 @@ Talk about recategorisation
         .range(cols)
 
       categoryColorScale2 = d3.scaleOrdinal()
-        .domain(categories)
-        .range(cols2)
+        .domain(threat_categories)
+        .range(threat_cols)
     }
 
     function createLegend(x, y) {
@@ -109,6 +112,21 @@ Talk about recategorisation
         .call(categoryLegend);
     }
 
+    function createLegend2(x, y) {
+      let svg = d3.select('#legend2')
+
+      categoryLegend2 = d3.legendColor()
+        .shape('path', d3.symbol().type(d3.symbolCircle).size(150)())
+        .shapePadding(10)
+        .scale(categoryColorScale2)
+
+
+      svg.append('g')
+        .attr('class', 'categoryLegend')
+        .attr('transform', `translate(${x},${y})`)
+        .call(categoryLegend2);
+    }
+
     // Map and projection
     var projection = d3.geoMercator()
       .center([0, 0]) // GPS of location to zoom on
@@ -116,7 +134,7 @@ Talk about recategorisation
       .translate([width / 2, height / 2])
 
     //load coordinates for plotting on map: modern corals
-    d3.csv("data/corals.csv", function(data) {
+    d3.csv("/data/corals.csv", function(data) {
       corals = data
     })
 
@@ -178,11 +196,13 @@ Talk about recategorisation
     }
 
     function draw1() {
+      createLegend(20, 50)
+
       let svg = d3.select('#vis').select('svg')
 
       var colors = d3.scaleOrdinal()
         .domain(categories)
-        .range(cols)
+        .range(cols2)
 
       d3.selectAll("circle")
         .transition()
@@ -198,6 +218,7 @@ Talk about recategorisation
     }
 
     function draw2() {
+      createLegend2(20, 50)
       let svg = d3.select('#vis').select('svg')
 
       var colors = d3.scaleOrdinal()

@@ -41,8 +41,13 @@
 
           (Data was provided by IUCN, OBIS, the Coral Traits Database and PBDB)
         </p>
+      </section>
+      <section class="step">
+        <h1>Threatened corals in modern oceans</h1>
+        <p>
+          IUCN
+        </p>
         <svg id='legend' width='400px' height='500px'></svg>
-
       </section>
       <section class="step">
         <h1>Threatened corals in modern oceans</h1>
@@ -85,9 +90,20 @@
     const height = 950 - margin.top - margin.bottom
 
     const categories = ["Data Deficient", "Least Concern", "Near Threatened", "Vulnerable", "Endangered", "Critically Endangered"]
+    const x1=[50,250,450,650,850,900]
+    const y1=[50,50,50,100,100,200]
     const cols = ["#767676FF", "#155F83FF", "#8A9045FF", "#FFA319FF", "#800000FF", "black"]
     const threat_categories = ["Data Deficient", "Not Threatened", "Threatened"]
     const threat_cols = ["#767676FF", "#155F83FF", "#800000FF"]
+
+    var yearCenters = {
+  "Data Deficient": { x: width / 3, y: height / 2 },
+  "Least Concern": { x: 2*width / 3, y: height / 2 },
+  "Near Threatened": { x: width, y: height / 2 },
+  "Vulnerable": { x: width / 3, y: height / 2 },
+  "Endangered": { x: width / 2, y: height / 2 },
+  "Critically Endangered": { x: 2 * width / 3, y: height / 2 }
+};
 
     //Create all the scales and save to global variables
 
@@ -99,6 +115,17 @@
       categoryColorScale2 = d3.scaleOrdinal()
         .domain(threat_categories)
         .range(threat_cols)
+
+        x = d3.scaleOrdinal()
+  .domain(categories)
+  .range([50, 150, 250, 100,200, 350])
+
+  y = d3.scaleOrdinal()
+.domain(categories)
+.range([10, 10, 10, 100,100, 200])
+
+
+
     }
 
     function createLegend(x, y) {
@@ -131,301 +158,104 @@
         .call(categoryLegend2);
     }
 
-    // Map and projection
-    var projection = d3.geoMercator()
-      .center([0, -30]) // GPS of location to zoom on
-      .scale(120) // This is like the zoom
-      .translate([width / 2, height / 2])
-
-    //load coordinates for plotting on map: modern corals
-    d3.csv("/data/corals.csv", function(data) {
-      corals = data
-    })
-
     //load coordinates for plotting on map: modern corals
     d3.csv("/data/traits_iucn.csv", function(data) {
       modern_traits = data
-    })
-
-
-    // Load external map data and boot
-    d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson", function(data) {
-      map = data
-      createScales()
       drawInitial()
     })
 
+function drawInitial(){
+  // creating legend for IUCN categories
+  createScales()
+  createLegend(20, 50)
+  createLegend2(20, 50)
 
-    function drawInitial() {
-      // creating legend for IUCN categories
-      createLegend(20, 50)
-      createLegend2(20, 50)
 
+  let svg = d3.select("#vis")
+    .append('svg')
+    .attr('width', 1000)
+    .attr('height', 950)
+    .attr('opacity', 1)
 
-      let svg = d3.select("#vis")
-        .append('svg')
-        .attr('width', 1000)
-        .attr('height', 950)
-        .attr('opacity', 1)
+  // make circles
+  var nodes = svg.append("g")
+  .selectAll("circle")
+  .data(modern_traits)
+  .enter()
+  .append("circle")
+    .attr("r", 10)
+    .attr("cx", width / 2)
+    .attr("cy", height / 2)
+    .style("fill", "darkgrey")
+    .style("fill-opacity", 0.8)
+    .attr("stroke", "black")
+    .style("stroke-width", 0)
 
-      // Draw the map
-      svg.append("g")
-        .attr("class", "worldmap")
-        .selectAll("path")
-        .data(map.features)
-        .enter().append("path")
-        .attr("fill", "#b8b8b8")
-        .attr("fill-opacity", .4)
-        .attr("d", d3.geoPath()
-          .projection(projection)
-        )
+    // Features of the forces applied to the nodes:
+    simulation = d3.forceSimulation()
+        .force("center", d3.forceCenter().x(width * 0.75).y(height / 2)) // Attraction to the center of the svg area
+        .force("charge", d3.forceManyBody().strength(0.5)) // Nodes are attracted one each other of value is > 0
+        .force("collide", d3.forceCollide().strength(.01).radius(30).iterations(1)) // Force that avoids circle overlapping
+         .velocityDecay(0.2);
 
-      // add points
-      var colors = d3.scaleOrdinal()
-        .domain(categories)
-        .range(cols)
-
-      svg.selectAll(".pin")
-        .data(corals)
-        .enter()
-        .append("circle", ".pin")
-        .attr("r", 3)
-        .attr("class", "circle map")
-        .attr("stroke-width", 1)
-        .attr("fill-opacity", .2)
-        .raise()
-        .attr("transform", function(d) {
-          return "translate(" + projection([
-            +d.decimalLongitude,
-            +d.decimalLatitude
-          ]) + ")";
+    // Apply these forces to the nodes and update their positions.
+    // Once the force algorithm is happy with positions ('alpha' value is low enough), simulations will stop.
+    simulation
+        .nodes(modern_traits)
+        .on("tick", function(d){
+          nodes
+              .attr("cx", function(d){ return d.x; })
+              .attr("cy", function(d){ return d.y; })
         })
-        .style("fill", function(d) {
-          return colors(d.redlistCategory)
-        })
-        .attr("stroke", function(d) {
-          return colors(d.redlistCategory)
-        })
+}
 
-      // Define the image variables
-      const circleX = 150;
-      const circleY = height / 2 - 150;
-      const radius = 80;
+function draw1(){
+  let svg = d3.select('#vis').select('svg')
 
-      // Define the line variables
-      const lineLength = 350;
-      const lineStart = [circleX + radius, circleY];
-      const lineEnd = [lineStart[0] + lineLength, circleY];
-
-      // Define the arrowhead marker variables
-      const markerBoxWidth = 20;
-      const markerBoxHeight = 20;
-      const refX = markerBoxWidth / 2;
-      const refY = markerBoxHeight / 2;
-      const markerWidth = markerBoxWidth / 2;
-      const markerHeight = markerBoxHeight / 2;
-      const arrowPoints = [
-        [0, 0],
-        [0, 20],
-        [20, 10]
-      ];
-
-      // Add the arrowhead marker definition to the svg element
-      svg
-        .append('defs')
-        .append('marker')
-        .attr('id', 'arrow')
-        .attr('viewBox', [0, 0, markerBoxWidth, markerBoxHeight])
-        .attr('refX', refX)
-        .attr('refY', refY)
-        .attr('markerWidth', markerBoxWidth)
-        .attr('markerHeight', markerBoxHeight)
-        .attr('orient', 'auto-start-reverse')
-        .append('path')
-        .attr('d', d3.line()(arrowPoints))
-        .attr('stroke', 'black');
-
-      // Add the line with arrowhead at the end
-      svg
-        .append('path')
-        .attr('d', d3.line()([lineStart, lineEnd]))
-        .attr('stroke', 'black')
-        .attr('marker-end', 'url(#arrow)')
-        .attr('fill', 'none')
-        .style("opacity", 0)
-        .attr("id", "my_line")
-
-      svg
-        .append('svg:image')
-        .attr("href", "www/branching.svg")
-        .attr('x', circleX - radius)
-        .attr('y', circleY - radius * 1.5)
-        .attr('width', radius * 2)
-        .attr('height', radius * 2)
-        .style("opacity", 0)
-
-      svg
-        .append('svg:image')
-        .attr("href", "www/nonbranching.svg")
-        .attr('x', lineEnd[0] + markerWidth + 10)
-        .attr('y', circleY - radius)
-        .attr('width', radius * 2)
-        .attr('height', radius * 2)
-        .style("opacity", 0)
-
-      svg.append("text")
-      .attr("class", "myLabel") //easy to style with CSS
-        .attr("y", circleY + radius) //magic number here
-        .attr("x", circleX)
-        .attr('text-anchor', 'middle')
-        .text("Branching corals")
-        .style("font-weight", "bold")
-        .style("font-family", "Domine")
-        .style("opacity", 0)
-
-        svg.append("text")
-          .attr("y", circleY + radius) //magic number here
-          .attr("x", lineEnd[0] + markerWidth + 10 + radius)
-          .attr('text-anchor', 'middle')
-          .attr("class", "myLabel") //easy to style with CSS
-          .text("Non-branching corals")
-          .style("font-weight", "bold")
-          .style("font-family", "Domine")
-          .style("opacity", 0)
-
-          svg.append("text")
-            .attr("y", circleY+20) //magic number here
-            .attr("x", lineStart[0] + 170)
-            .attr('text-anchor', 'middle')
-            .attr("class", "myLabel") //easy to style with CSS
-            .text("Decreasing extinction risk")
-            .style("font-style", "italic")
-            .style("font-family", "Domine")
-            .style("opacity", 0)
-
-            svg.append("text")
-              .attr("y", circleY-10) //magic number here
-              .attr("x", lineStart[0] + 170)
-              .attr('text-anchor', 'middle')
-              .attr("class", "myLabel") //easy to style with CSS
-              .text("Decreasing degree of branching")
-              .style("font-style", "italic")
-              .style("font-family", "Domine")
-              .style("opacity", 0)
-
-    }
-
-    function draw1() {
-      createLegend(20, 50)
-
-      let svg = d3.select('#vis').select('svg')
-
-      var colors = d3.scaleOrdinal()
-        .domain(categories)
-        .range(cols)
-
-      // change colour again if scrolling up
-      d3.selectAll("circle.map")
-        .transition()
-        .attr("duration", function(d, i) {
-          return 100 + i * 0
-        })
-        .style("fill", function(d) {
-          return colors(d.redlistCategory)
-        })
-        .attr("stroke", function(d) {
-          return colors(d.redlistCategory)
-        })
-    }
-
-    function draw2() {
-      let svg = d3.select('#vis').select('svg')
+  d3.selectAll("circle")
+    .transition()
+    .attr("duration", function(d, i) {
+      return 100 + i * 0
+    })
+    .style("fill", "darkgrey")
+}
 
 
+function draw2(){
+  let svg = d3.select('#vis').select('svg')
 
-      //show map again if scrolling up
-      d3.selectAll("path")
-        .transition()
-        .attr("duration", function(d, i) {
-          return 100 + i * 0
-        })
-        .attr("fill-opacity", .4)
+  d3.selectAll("circle")
+    .transition()
+    .attr("duration", function(d, i) {
+      return 100 + i * 0
+    })
+    .style("fill", function(d) {
+      return categoryColorScale(d.redlistCategory)
+    })
+}
 
-      // change colour of points on map
-      var colors = d3.scaleOrdinal()
-        .domain(threat_categories)
-        .range(threat_cols)
+function draw3(){
+  let svg = d3.select('#vis').select('svg')
 
-      d3.selectAll(".circle.map")
-        .transition()
-        .attr("duration", function(d, i) {
-          return 100 + i * 0
-        })
-        .style("fill", function(d) {
-          return colors(d.threat)
-        })
-        .attr("stroke", function(d) {
-          return colors(d.threat)
-        })
-        .attr("stroke-width", 1)
-        .attr("fill-opacity", .2)
 
-      showTraits(0)
+  svg.selectAll('circle')
+        .transition().duration(400).delay((d, i) => i * 5)
+        .attr('r', 5)
 
-    }
+        function nodeYearPos(d) {
+          return yearCenters[d.year].x;
+        }
 
-    function draw3() {
-      let svg = d3.select('#vis').select('svg')
+        function nodeYearPos(d) {
+          return yearCenters[d.redlistCategory].x;
+        }
 
-      // remove map
-      d3.selectAll(".worldmap")
-        .selectAll("path")
-        .transition()
-        .attr("duration", function(d, i) {
-          return 100 + i * 0
-        })
-        .attr("fill-opacity", 0)
-      //remove points on map
-      d3.selectAll("circle.map")
-        .transition()
-        .attr("duration", function(d, i) {
-          return 100 + i * 0
-        })
-        .attr("stroke-width", 0)
-        .attr("fill-opacity", 0)
+        // Reset the x force of the simulation
+        simulation.force('x', d3.forceX().strength(0.05).x(nodeYearPos));
+        simulation.alpha(1).restart();
 
-      showTraits(1)
-    }
 
-    function showTraits(o) {
-      d3.selectAll("image")
-        .transition()
-        .attr("duration", function(d, i) {
-          return 100 + i * 0
-        })
-        .style("opacity", o)
-
-      d3.select("#my_line")
-        .transition()
-        .duration(100)
-        .style("opacity", o)
-
-      d3.select("#arrow")
-        .style("opacity", o)
-        .selectAll("path")
-        .transition()
-        .duration(100)
-        .attr("fill-opacity", o)
-
-        d3.selectAll(".myLabel")
-          .transition()
-          .attr("duration", function(d, i) {
-            return 100 + i * 0
-          })
-          .style("opacity", o)
-
-    }
-
+}
     //Array of all the graph functions
     //Will be called from the scroller functionality
 

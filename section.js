@@ -49,6 +49,21 @@
       }
     };
 
+    var posCenters2 = {
+      "Data Deficient": {
+        x: width / 3,
+        y: height / 2
+      },
+      "Not Threatened": {
+        x: 2 * width / 3,
+        y: height / 2
+      },
+      "Threatened": {
+        x: width,
+        y: height / 2
+      }
+    };
+
     //Create all the scales and save to global variables
 
     function createScales() {
@@ -59,21 +74,25 @@
       categoryColorScale2 = d3.scaleOrdinal()
         .domain(threat_categories)
         .range(threat_cols)
-
-      x = d3.scaleOrdinal()
-        .domain(categories)
-        .range([50, 150, 250, 100, 200, 350])
-
-      y = d3.scaleOrdinal()
-        .domain(categories)
-        .range([10, 10, 10, 100, 100, 200])
-
-
-
     }
 
     function createLegend(x, y) {
       let svg = d3.select('#legend')
+
+      categoryLegend = d3.legendColor()
+        .shape('path', d3.symbol().type(d3.symbolCircle).size(150)())
+        .shapePadding(10)
+        .scale(categoryColorScale)
+
+
+      svg.append('g')
+        .attr('class', 'categoryLegend')
+        .attr('transform', `translate(${x},${y})`)
+        .call(categoryLegend);
+    }
+
+    function createLegend3(x, y) {
+      let svg = d3.select('#legend3')
 
       categoryLegend = d3.legendColor()
         .shape('path', d3.symbol().type(d3.symbolCircle).size(150)())
@@ -113,6 +132,7 @@
       createScales()
       createLegend(20, 50)
       createLegend2(20, 50)
+      createLegend3(20, 50)
 
 
       let svg = d3.select("#vis")
@@ -157,6 +177,67 @@
             })
         })
 
+      //Initialises the text and rectangles, and sets opacity to 0 for IUCN
+      svg.selectAll('.cat-rect')
+        .data(categories).enter()
+        .append('rect')
+        .attr('class', 'cat-rect')
+        .attr('x', d => posCenters[d].x + 1000)
+        .attr('y', d => posCenters[d].y + 150)
+        .attr('width', 160)
+        .attr('height', 30)
+        .attr('opacity', 0)
+        .attr('fill', 'grey')
+
+      svg.selectAll('.lab-text')
+        .data(categories).enter()
+        .append('text')
+        .attr('class', 'lab-text')
+        .attr('opacity', 0)
+        .text(function(d) {
+          return d;
+        })
+        .raise()
+
+      svg.selectAll('.lab-text')
+        .attr('x', d => posCenters[d].x + 80 + 1000)
+        .attr('y', d => posCenters[d].y + 150 + 20 + 1000)
+        .attr('font-family', 'Domine')
+        .attr('font-size', '12px')
+        .attr('font-weight', 700)
+        .attr('fill', 'black')
+        .attr('text-anchor', 'middle')
+
+        //Initialises the text and rectangles, and sets opacity to 0 for Threatened
+        svg.selectAll('.threat-rect')
+          .data(threat_categories).enter()
+          .append('rect')
+          .attr('class', 'threat-rect')
+          .attr('x', d => posCenters2[d].x + 1000)
+          .attr('y', d => posCenters2[d].y + 150)
+          .attr('width', 160)
+          .attr('height', 30)
+          .attr('opacity', 0)
+          .attr('fill', 'grey')
+
+          svg.selectAll('.threat-text')
+            .data(threat_categories).enter()
+            .append('text')
+            .attr('class', 'threat-text')
+            .attr('opacity', 0)
+            .text(function(d) {
+              return d;
+            })
+            .raise()
+
+          svg.selectAll('.threat-text')
+            .attr('x', d => posCenters2[d].x + 80 + 1000)
+            .attr('y', d => posCenters2[d].y + 150 + 20 + 1000)
+            .attr('font-family', 'Domine')
+            .attr('font-size', '12px')
+            .attr('font-weight', 700)
+            .attr('fill', 'black')
+            .attr('text-anchor', 'middle')
     }
 
     function draw1() {
@@ -172,6 +253,7 @@
 
 
     function draw2() {
+      createLegend(20, 50)
       let svg = d3.select('#vis').select('svg')
 
       d3.selectAll("circle")
@@ -180,7 +262,7 @@
         .style("fill", function(d) {
           return categoryColorScale(d.redlistCategory)
         })
-        .transition().duration(400)
+        .transition().duration(100)
         .attr('r', 10)
 
       simulation
@@ -189,16 +271,30 @@
         .force('y', d3.forceY().y(height / 2))
         .force("collide", d3.forceCollide().strength(.05).radius(30).iterations(5)) // Force that avoids circle overlapping
 
-      simulation.alpha(0.4).alphaTarget(0.2).velocityDecay(0.05).restart();
+      simulation.alpha(0.4).alphaTarget(0.2).velocityDecay(0.2).restart();
+
+      svg.selectAll('.cat-rect').transition().duration(300).delay((d, i) => i * 30)
+        .attr('opacity', 0)
+        .attr('x', d => posCenters[d].x+1000)
+
+      svg.selectAll('.lab-text').transition().duration(300).delay((d, i) => i * 30)
+        .attr('x', d => posCenters[d].x + 80+1000)
+        .attr('y', d => posCenters[d].y + 150 + 20+1000)
+        .attr('opacity', 0)
+
     }
 
     function draw3() {
+
       let svg = d3.select('#vis').select('svg')
 
 
       svg.selectAll('circle')
         .transition().duration(400).delay((d, i) => i * 2)
         .attr('r', 6)
+        .style("fill", function(d) {
+          return categoryColorScale(d.redlistCategory)
+        })
 
 
       // Reset the x force of the simulation
@@ -213,7 +309,79 @@
         .force("collide", d3.forceCollide().strength(.01).radius(30).iterations(1)) // Force that avoids circle overlapping
       simulation.alpha(0.6).alphaTarget(0.4).velocityDecay(0.2).restart();
 
+// Show IUCN Text
+      svg.selectAll('.cat-rect').transition().duration(300).delay((d, i) => i * 30)
+        .attr('opacity', 0.2)
+        .attr('x', d => posCenters[d].x)
 
+      svg.selectAll('.lab-text').transition().duration(300).delay((d, i) => i * 30)
+        .text(function(d) {
+          return d;
+        })
+        .attr('x', d => posCenters[d].x + 80)
+        .attr('y', d => posCenters[d].y + 150 + 20)
+        .attr('opacity', 1)
+
+        // hide threat Text
+        svg.selectAll('.threat-rect').transition().duration(300).delay((d, i) => i * 30)
+          .attr('opacity', 0)
+          .attr('x', d => posCenters2[d].x+1000)
+
+        svg.selectAll('.threat-text').transition().duration(300).delay((d, i) => i * 30)
+          .attr('x', d => posCenters2[d].x+30+1000)
+          .attr('y', d => posCenters2[d].y + 150 + 20)
+          .attr('opacity', 0)
+    }
+
+    function draw4() {
+      let svg = d3.select('#vis').select('svg')
+
+
+      d3.selectAll("circle")
+        .transition()
+        .duration(400)
+        .style("fill", function(d) {
+          return categoryColorScale2(d.threat)
+        })
+        .transition().duration(400)
+
+      // Reset the x force of the simulation
+      simulation.force('x', d3.forceX().strength(0.1)
+        .x(function xPos(d) {
+          return posCenters2[d.threat].x;
+        }))
+      simulation
+        .force('y', d3.forceY().strength(0.1).y(function yPos(d) {
+          return posCenters2[d.threat].y;
+        }))
+        .force("collide", d3.forceCollide().strength(.01).radius(30).iterations(1)) // Force that avoids circle overlapping
+      simulation.alpha(0.6).alphaTarget(0.4).velocityDecay(0.2).restart();
+
+// hide IUCN
+      svg.selectAll('.cat-rect').transition().duration(300).delay((d, i) => i * 30)
+        .attr('opacity', 0)
+        .attr('x', d => posCenters[d].x + 1000)
+
+      svg.selectAll('.lab-text').transition().duration(300).delay((d, i) => i * 30)
+        .text(function(d) {
+          return d;
+        })
+        .attr('x', d => posCenters[d].x + 80 + 1000)
+        .attr('y', d => posCenters[d].y + 150 + 20 + 1000)
+        .attr('opacity', 1)
+
+// show Threats
+        svg.selectAll('.threat-rect').transition().duration(300).delay((d, i) => i * 30)
+          .attr('opacity', 0.2)
+          .attr('x', d => posCenters2[d].x-50)
+
+          svg.selectAll('.threat-text').transition().duration(300).delay((d, i) => i * 30)
+            .text(function(d) {
+              return d;
+            })
+            .attr('x', d => posCenters2[d].x+30)
+            .attr('y', d => posCenters2[d].y + 150 + 20)
+            .attr('opacity', 1)
     }
     //Array of all the graph functions
     //Will be called from the scroller functionality
@@ -221,7 +389,8 @@
     let activationFunctions = [
       draw1,
       draw2,
-      draw3
+      draw3,
+      draw4
     ]
 
     //All the scrolling function

@@ -177,6 +177,14 @@
             })
         })
 
+        svg.append("text")
+        .attr("x", (width))
+        .attr("y", (height *.95))
+        .attr("text-anchor", "right")
+        .attr('font-family', 'Domine')
+        .style("font-size", "10px")
+        .text("*Each circle represents one coral species");
+
       //Initialises the text and rectangles, and sets opacity to 0 for IUCN
       svg.selectAll('.cat-rect')
         .data(categories).enter()
@@ -307,7 +315,7 @@
           return posCenters[d.redlistCategory].y;
         }))
         .force("collide", d3.forceCollide().strength(.01).radius(30).iterations(1)) // Force that avoids circle overlapping
-      simulation.alpha(0.6).alphaTarget(0.4).velocityDecay(0.2).restart();
+      simulation.alpha(0.6).alphaTarget(0.2).velocityDecay(0.2).restart();
 
 // Show IUCN Text
       svg.selectAll('.cat-rect').transition().duration(300).delay((d, i) => i * 30)

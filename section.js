@@ -12,8 +12,8 @@
       bottom: 50,
       right: 20
     }
-    const width = 1000 - margin.left - margin.right
-    const height = 950 - margin.top - margin.bottom
+    const width = self.innerWidth/2
+    const height = self.innerHeight
 
     const categories = ["Data Deficient", "Least Concern", "Near Threatened", "Vulnerable", "Endangered", "Critically Endangered"]
     const x1 = [50, 250, 450, 650, 850, 900]
@@ -25,42 +25,42 @@
     var posCenters = {
       "Data Deficient": {
         x: width / 3,
-        y: height / 3
+        y: height / 5
       },
       "Least Concern": {
         x: 2 * width / 3,
-        y: height / 3
+        y: height / 5
       },
       "Near Threatened": {
         x: width,
-        y: height / 3
+        y: height / 5
       },
       "Vulnerable": {
         x: width / 3,
-        y: 2 * height / 3
+        y: 3 * height / 5
       },
       "Endangered": {
         x: 2 * width / 3,
-        y: 2 * height / 3
+        y: 3 * height / 5
       },
       "Critically Endangered": {
         x: width,
-        y: 2 * height / 3
+        y: 3 * height / 5
       }
     };
 
     var posCenters2 = {
       "Data Deficient": {
         x: width / 3,
-        y: height / 2
+        y: height / 3
       },
       "Not Threatened": {
         x: 2 * width / 3,
-        y: height / 2
+        y: height / 3
       },
       "Threatened": {
         x: width,
-        y: height / 2
+        y: height / 3
       }
     };
 
@@ -137,8 +137,8 @@
 
       let svg = d3.select("#vis")
         .append('svg')
-        .attr('width', 1000)
-        .attr('height', 950)
+        .attr('width', width)
+        .attr('height', height)
         .attr('opacity', 1)
 
       // make circles
@@ -157,7 +157,7 @@
 
       // Features of the forces applied to the nodes:
       simulation = d3.forceSimulation()
-        .force("center", d3.forceCenter().x(width * 0.75).y(height / 2)) // Attraction to the center of the svg area
+        .force("center", d3.forceCenter().x(width/2).y(height / 2)) // Attraction to the center of the svg area
         .force("charge", d3.forceManyBody().strength(0.5)) // Nodes are attracted one each other of value is > 0
         .force("collide", d3.forceCollide().strength(.01).radius(30).iterations(1)) // Force that avoids circle overlapping
         .alpha(0.4).alphaTarget(0.2)
@@ -195,7 +195,7 @@
         .attr('width', 160)
         .attr('height', 30)
         .attr('opacity', 0)
-        .attr('fill', 'grey')
+        .attr('fill', 'lightgrey')
 
       svg.selectAll('.lab-text')
         .data(categories).enter()
@@ -226,7 +226,7 @@
           .attr('width', 160)
           .attr('height', 30)
           .attr('opacity', 0)
-          .attr('fill', 'grey')
+          .attr('fill', 'lightgrey')
 
           svg.selectAll('.threat-text')
             .data(threat_categories).enter()
@@ -240,7 +240,7 @@
 
           svg.selectAll('.threat-text')
             .attr('x', d => posCenters2[d].x + 80 + 1000)
-            .attr('y', d => posCenters2[d].y + 150 + 20 + 1000)
+            .attr('y', d => posCenters2[d].y + 150 + 20)
             .attr('font-family', 'Domine')
             .attr('font-size', '12px')
             .attr('font-weight', 700)
@@ -287,7 +287,7 @@
 
       svg.selectAll('.lab-text').transition().duration(300).delay((d, i) => i * 30)
         .attr('x', d => posCenters[d].x + 80+1000)
-        .attr('y', d => posCenters[d].y + 150 + 20+1000)
+        .attr('y', d => posCenters[d].y + 150 + 20)
         .attr('opacity', 0)
 
     }
@@ -317,16 +317,18 @@
         .force("collide", d3.forceCollide().strength(.01).radius(30).iterations(1)) // Force that avoids circle overlapping
       simulation.alpha(0.6).alphaTarget(0.2).velocityDecay(0.2).restart();
 
+      svg.selectAll("circle").lower()
+
 // Show IUCN Text
       svg.selectAll('.cat-rect').transition().duration(300).delay((d, i) => i * 30)
-        .attr('opacity', 0.2)
-        .attr('x', d => posCenters[d].x)
+        .attr('opacity', 0.8)
+        .attr('x', d => posCenters[d].x-160)
 
       svg.selectAll('.lab-text').transition().duration(300).delay((d, i) => i * 30)
         .text(function(d) {
           return d;
         })
-        .attr('x', d => posCenters[d].x + 80)
+        .attr('x', d => posCenters[d].x-80)
         .attr('y', d => posCenters[d].y + 150 + 20)
         .attr('opacity', 1)
 
@@ -380,14 +382,14 @@
 
 // show Threats
         svg.selectAll('.threat-rect').transition().duration(300).delay((d, i) => i * 30)
-          .attr('opacity', 0.2)
-          .attr('x', d => posCenters2[d].x-50)
+          .attr('opacity', 0.8)
+          .attr('x', d => posCenters2[d].x-160-50)
 
           svg.selectAll('.threat-text').transition().duration(300).delay((d, i) => i * 30)
             .text(function(d) {
               return d;
             })
-            .attr('x', d => posCenters2[d].x+30)
+            .attr('x', d => posCenters2[d].x+30-160)
             .attr('y', d => posCenters2[d].y + 150 + 20)
             .attr('opacity', 1)
     }

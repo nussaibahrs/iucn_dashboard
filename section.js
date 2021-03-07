@@ -12,6 +12,7 @@
       bottom: 50,
       right: 20
     }
+
     const width = self.innerWidth/2
     const height = self.innerHeight
 

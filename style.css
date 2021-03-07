@@ -3,118 +3,115 @@
 @import url('https://fonts.googleapis.com/css?family=Domine:400,700&display=swap');
 
 body {
-    background-color: rgb(245, 244, 241);
-    overflow-x: hidden;
+  background-color: rgb(245, 244, 241);
+  overflow-x: hidden;
 }
 
 #sections {
-    position: relative;
-    display: inline-block;
-    width: 100%;
-    height: 100%;
-    top: 60px;
-    z-index: 10;
-    margin-right: 50px;
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  top: 60px;
+  z-index: 10;
+  margin-right: 50px;
 }
 
 .categoryLegend {
-    font-family: "Domine";
+  font-family: "Domine";
 }
 
 .myLabel {
-    font-family: "Domine";
+  font-family: "Domine";
 }
 
-
 .step {
-    margin-bottom: 400px;
-    margin-left: 30%;
-    margin-right: 30%;
-    height: 500px;
-    font-family: "Domine";
-    font-weight: 400;
-    line-height: 1.4em;
-    text-align: justify;
-    background-color:  rgba(245, 244, 241, 0.8);
-    padding: 20px;
-    /* display: flex;
+  margin-bottom: 400px;
+  margin-left: 30%;
+  margin-right: 30%;
+  height: 500px;
+  font-family: "Domine";
+  font-weight: 400;
+  line-height: 1.4em;
+  text-align: justify;
+  background-color: rgba(245, 244, 241, 0.8);
+  padding: 20px;
+  /* display: flex;
     flex-direction: column;
     justify-content: space-around; */
 }
 
-
 h1, h2 {
-    font-weight: 700;
-    text-align: right;
-    line-height: 32px;
+  font-weight: 700;
+  text-align: right;
+  line-height: 32px;
 }
 
 h1 {
-    font-size: 35px;
+  font-size: 35px;
 }
 
 strong {
-    color: rgb(245, 155, 155);
+  color: rgb(245, 155, 155);
 }
 
 #graphic {
-    margin: 30%
-    width: 60%;
-    flex-direction: row;
-    align-items: top;
-    justify-content: space-around;
+  margin: 30% width: 60%;
+  flex-direction: row;
+  align-items: top;
+  justify-content: space-around;
 }
 
 #vis {
-    display: inline-block;
-    position: fixed;
-    top: 0px;
-    z-index: 1;
-    margin-left: 0;
+  display: inline-block;
+  position: fixed;
+  top: 0px;
+  z-index: 1;
+  margin-left: 0;
 }
 
 .tick line {
-    stroke: 'red'
+  stroke: 'red'
 }
 
 #tooltip {
-    position: absolute;
-    display: none;
-    background: rgba(0, 0, 0, .7);
-    border-radius: 3px;
-    box-shadow: -3px 3px 15px #939393;
-    color: white;
-    padding: 6px;
-    font-family: "Merriweather";
-    font-size: 1.1em;
-    max-width: 400px;
-    z-index: 100;
+  position: absolute;
+  display: none;
+  background: rgba(0, 0, 0, .7);
+  border-radius: 3px;
+  box-shadow: -3px 3px 15px #939393;
+  color: white;
+  padding: 6px;
+  font-family: "Merriweather";
+  font-size: 1.1em;
+  max-width: 400px;
+  z-index: 100;
 }
 
-svg circle:hover{
-    cursor: pointer;
+svg circle:hover {
+  cursor: pointer;
 }
 
 .swatch {
-    fill: #939393;
+  fill: #939393;
 }
 
 .sizeLegend2 {
-    opacity: 0.7
+  opacity: 0.7
 }
 
 a {
-    color: rgb(221, 0, 255);
-    text-decoration: none;
+  color: rgb(221, 0, 255);
+  text-decoration: none;
 }
 
 img {
-    display: none;
+  display: none;
 }
 
-@media screen  and (max-device-width: 800px) {
+@media screen and (max-device-width: 800px) {
   .step {
     margin-left: 10%;
-    margin-right: 10%;
-    }
+    width: 80%
+  }
 }

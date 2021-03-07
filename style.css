@@ -58,8 +58,8 @@ strong {
 }
 
 #graphic {
-    margin: 20%
-    width: 50%;
+    margin: 30%
+    width: 60%;
     flex-direction: row;
     align-items: top;
     justify-content: space-around;
@@ -71,8 +71,6 @@ strong {
     top: 0px;
     z-index: 1;
     margin-left: 0;
-    height: 1000px;
-    width: 1000px;
 }
 
 .tick line {
@@ -114,12 +112,9 @@ img {
     display: none;
 }
 
-@media all and (max-width:800px) //800px for tablets and phones.
-{
-    #sections, #vis
-    {
-        display: block;
-        float: none;
-        width: 100%;
+@media screen  and (max-device-width: 800px) {
+  .step {
+    margin-left: 10%;
+    margin-right: 10%;
     }
 }

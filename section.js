@@ -25,42 +25,42 @@
 
     var posCenters = {
       "Data Deficient": {
-        x: width / 3,
+        x: width / 4,
         y: height / 5
       },
       "Least Concern": {
-        x: 2 * width / 3,
+        x: width/2,
         y: height / 5
       },
       "Near Threatened": {
-        x: width,
+        x: 3*width/4,
         y: height / 5
       },
       "Vulnerable": {
-        x: width / 3,
+        x: width / 4,
         y: 3 * height / 5
       },
       "Endangered": {
-        x: 2 * width / 3,
+        x: width / 2,
         y: 3 * height / 5
       },
       "Critically Endangered": {
-        x: width,
+        x: 3*width/4,
         y: 3 * height / 5
       }
     };
 
     var posCenters2 = {
       "Data Deficient": {
-        x: width / 3,
+        x: 2*width / 5,
         y: height / 3
       },
       "Not Threatened": {
-        x: 2 * width / 3,
+        x: 3* width/5,
         y: height / 3
       },
       "Threatened": {
-        x: width,
+        x: 4*width/5,
         y: height / 3
       }
     };

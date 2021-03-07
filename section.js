@@ -21,42 +21,42 @@
 
     var posCenters = {
       "Data Deficient": {
-        x: width / 6,
+        x: 2*width / 5,
         y: height / 5
       },
       "Least Concern": {
-        x: width/2,
+        x: 3*width/5,
         y: height / 5
       },
       "Near Threatened": {
-        x: 5*width/6,
+        x: 4*width/5,
         y: height / 5
       },
       "Vulnerable": {
-        x: width / 6,
+        x: 2*width / 5,
         y: 3 * height / 5
       },
       "Endangered": {
-        x: width / 2,
+        x:3*width / 5,
         y: 3 * height / 5
       },
       "Critically Endangered": {
-        x: 5*width/6,
+        x: 4*width / 5,
         y: 3 * height / 5
       }
     };
 
     var posCenters2 = {
       "Data Deficient": {
-        x: width / 6,
+        x: 2*width / 5,
         y: height / 3
       },
       "Not Threatened": {
-        x: width/2,
+        x: 3*width/5,
         y: height / 3
       },
       "Threatened": {
-        x: 5*width/6,
+        x: 4*width/5,
         y: height / 3
       }
     };
@@ -319,13 +319,13 @@
 // Show IUCN Text
       svg.selectAll('.cat-rect').transition().duration(300).delay((d, i) => i * 30)
         .attr('opacity', 0.8)
-        .attr('x', d => (posCenters[d].x - r_width/2))
+        .attr('x', d => (posCenters[d].x - r_width))
 
       svg.selectAll('.lab-text').transition().duration(300).delay((d, i) => i * 30)
         .text(function(d) {
           return d;
         })
-        .attr('x', d => posCenters[d].x)
+        .attr('x', d => (posCenters[d].x - r_width/2))
         .attr('y', d => posCenters[d].y + 150 + 20)
         .attr('opacity', 1)
 
@@ -380,14 +380,15 @@
 // show Threats
         svg.selectAll('.threat-rect').transition().duration(300).delay((d, i) => i * 30)
           .attr('opacity', 0.8)
-          .attr('x', d => (posCenters2[d].x - r_width/2))
+          .attr('x', d => posCenters2[d].x-r_width)
+          .attr('y', d => posCenters2[d].y + 90  - 20)
 
           svg.selectAll('.threat-text').transition().duration(300).delay((d, i) => i * 30)
             .text(function(d) {
               return d;
             })
-            .attr('x', d => posCenters2[d].x)
-            .attr('y', d => posCenters2[d].y + 150 + 20)
+            .attr('x', d => (posCenters2[d].x-r_width/2))
+            .attr('y', d => posCenters2[d].y + 90)
             .attr('opacity', 1)
     }
     //Array of all the graph functions

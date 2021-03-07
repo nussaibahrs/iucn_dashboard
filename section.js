@@ -13,7 +13,7 @@
       right: 20
     }
 
-    const width = self.innerWidth/2
+    const width = self.innerWidth
     const height = self.innerHeight
 
     const categories = ["Data Deficient", "Least Concern", "Near Threatened", "Vulnerable", "Endangered", "Critically Endangered"]

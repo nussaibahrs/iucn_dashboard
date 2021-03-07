@@ -101,7 +101,7 @@ svg circle:hover {
 }
 
 a {
-  color: rgb(221, 0, 255);
+  color: rgb(21, 95, 131);
   text-decoration: none;
 }
 
@@ -112,6 +112,7 @@ img {
 @media screen and (max-device-width: 800px) {
   .step {
     margin-left: 10%;
-    width: 80%
+    width: 80%;
+    margin-bottom: 1000px;
   }
 }

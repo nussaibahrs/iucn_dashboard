@@ -6,15 +6,11 @@
     let categoryColorScale2, categoryLegend2
     let nodes
 
-    const margin = {
-      left: 170,
-      top: 50,
-      bottom: 50,
-      right: 20
-    }
+
 
     const width = self.innerWidth
     const height = self.innerHeight
+    const r_width = 160
 
     const categories = ["Data Deficient", "Least Concern", "Near Threatened", "Vulnerable", "Endangered", "Critically Endangered"]
     const x1 = [50, 250, 450, 650, 850, 900]
@@ -193,7 +189,7 @@
         .attr('class', 'cat-rect')
         .attr('x', d => posCenters[d].x + 1000)
         .attr('y', d => posCenters[d].y + 150)
-        .attr('width', 160)
+        .attr('width', r_width)
         .attr('height', 30)
         .attr('opacity', 0)
         .attr('fill', 'lightgrey')
@@ -209,8 +205,8 @@
         .raise()
 
       svg.selectAll('.lab-text')
-        .attr('x', d => posCenters[d].x + 80 + 1000)
-        .attr('y', d => posCenters[d].y + 150 + 20 + 1000)
+        .attr('x', d => posCenters[d].x + 1000)
+        .attr('y', d => posCenters[d].y + 150 + 20)
         .attr('font-family', 'Domine')
         .attr('font-size', '12px')
         .attr('font-weight', 700)
@@ -323,13 +319,13 @@
 // Show IUCN Text
       svg.selectAll('.cat-rect').transition().duration(300).delay((d, i) => i * 30)
         .attr('opacity', 0.8)
-        .attr('x', d => posCenters[d].x-160)
+        .attr('x', d => (posCenters[d].x - r_width/2))
 
       svg.selectAll('.lab-text').transition().duration(300).delay((d, i) => i * 30)
         .text(function(d) {
           return d;
         })
-        .attr('x', d => posCenters[d].x-80)
+        .attr('x', d => posCenters[d].x)
         .attr('y', d => posCenters[d].y + 150 + 20)
         .attr('opacity', 1)
 
@@ -359,7 +355,7 @@
       // Reset the x force of the simulation
       simulation.force('x', d3.forceX().strength(0.1)
         .x(function xPos(d) {
-          return posCenters2[d.threat].x;
+          return (posCenters2[d.threat].x);
         }))
       simulation
         .force('y', d3.forceY().strength(0.1).y(function yPos(d) {
@@ -384,13 +380,13 @@
 // show Threats
         svg.selectAll('.threat-rect').transition().duration(300).delay((d, i) => i * 30)
           .attr('opacity', 0.8)
-          .attr('x', d => posCenters2[d].x-160-50)
+          .attr('x', d => (posCenters2[d].x - r_width/2))
 
           svg.selectAll('.threat-text').transition().duration(300).delay((d, i) => i * 30)
             .text(function(d) {
               return d;
             })
-            .attr('x', d => posCenters2[d].x+30-160)
+            .attr('x', d => posCenters2[d].x)
             .attr('y', d => posCenters2[d].y + 150 + 20)
             .attr('opacity', 1)
     }

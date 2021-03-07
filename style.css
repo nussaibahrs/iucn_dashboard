@@ -56,13 +56,14 @@ strong {
 }
 
 #graphic {
-  margin: 30% width: 60%;
+  margin: 30% 
   flex-direction: row;
   align-items: top;
   justify-content: space-around;
 }
 
 #vis {
+
   display: inline-block;
   position: fixed;
   top: 0px;
